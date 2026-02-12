@@ -191,6 +191,7 @@ static void S_StopChannel(int cnum)
 void S_Start(void)
 {
     int cnum;
+    int mnum;
 
     // kill all playing sounds at start of level
     //  (trust me - a good idea)
@@ -205,7 +206,38 @@ void S_Start(void)
     // start new music for the level
     mus_paused = 0;
 
-    // Music disabled for embedded DOOM — skip S_ChangeMusic
+    if (gamemode == commercial)
+    {
+        mnum = mus_runnin + gamemap - 1;
+    }
+    else
+    {
+        int spmus[]=
+        {
+            // Song - Who? - Where?
+
+            mus_e3m4,        // American     e4m1
+            mus_e3m2,        // Romero       e4m2
+            mus_e3m3,        // Shawn        e4m3
+            mus_e1m5,        // American     e4m4
+            mus_e2m7,        // Tim          e4m5
+            mus_e2m4,        // Romero       e4m6
+            mus_e2m6,        // J.Anderson   e4m7 CHIRON.WAD
+            mus_e2m5,        // Shawn        e4m8
+            mus_e1m9,        // Tim          e4m9
+        };
+
+        if (gameepisode < 4)
+        {
+            mnum = mus_e1m1 + (gameepisode-1)*9 + gamemap-1;
+        }
+        else
+        {
+            mnum = spmus[gamemap-1];
+        }
+    }
+
+    S_ChangeMusic(mnum, true);
 }        
 
 void S_StopSound(mobj_t *origin)
@@ -431,20 +463,20 @@ void S_StartSound(void *origin_p, int sfx_id)
 
 void S_PauseSound(void)
 {
-//    if (mus_playing && !mus_paused)
-//    {
-//        I_PauseSong();
-//        mus_paused = true;
-//    }
+    if (mus_playing && !mus_paused)
+    {
+        I_PauseSong();
+        mus_paused = true;
+    }
 }
 
 void S_ResumeSound(void)
 {
-//    if (mus_playing && mus_paused)
-//    {
-//        I_ResumeSong();
-//        mus_paused = false;
-//    }
+    if (mus_playing && mus_paused)
+    {
+        I_ResumeSong();
+        mus_paused = false;
+    }
 }
 
 //
@@ -544,77 +576,67 @@ void S_SetSfxVolume(int volume)
 
 void S_StartMusic(int m_id)
 {
-    //S_ChangeMusic(m_id, false);
+    S_ChangeMusic(m_id, false);
 }
 
 void S_ChangeMusic(int musicnum, int looping)
 {
-//    musicinfo_t *music = NULL;
-//    char namebuf[9];
-//    void *handle;
-//
-//    // The Doom IWAD file has two versions of the intro music: d_intro
-//    // and d_introa.  The latter is used for OPL playback.
-//
-//    if (musicnum == mus_intro && (snd_musicdevice == SNDDEVICE_ADLIB
-//                               || snd_musicdevice == SNDDEVICE_SB))
-//    {
-//        musicnum = mus_introa;
-//    }
-//
-//    if (musicnum <= mus_None || musicnum >= NUMMUSIC)
-//    {
-//        I_Error("Bad music number %d", musicnum);
-//    }
-//    else
-//    {
-//        music = &S_music[musicnum];
-//    }
-//
-//    if (mus_playing == music)
-//    {
-//        return;
-//    }
-//
-//    // shutdown old music
-//    S_StopMusic();
-//
-//    // get lumpnum if neccessary
-//    if (!music->lumpnum)
-//    {
-//        M_snprintf(namebuf, sizeof(namebuf), "d_%s", DEH_String(music->name));
-//        music->lumpnum = W_GetNumForName(namebuf);
-//    }
-//
-//    music->data = W_CacheLumpNum(music->lumpnum, PU_STATIC);
-//
-//    handle = I_RegisterSong(music->data, W_LumpLength(music->lumpnum));
-//    music->handle = handle;
-//    I_PlaySong(handle, looping);
-//
-//    mus_playing = music;
+    musicinfo_t *music = NULL;
+    char namebuf[9];
+    void *handle;
+
+    if (musicnum <= mus_None || musicnum >= NUMMUSIC)
+    {
+        return;
+    }
+    else
+    {
+        music = &S_music[musicnum];
+    }
+
+    if (mus_playing == music)
+    {
+        return;
+    }
+
+    // shutdown old music
+    S_StopMusic();
+
+    // get lumpnum if neccessary
+    if (!music->lumpnum)
+    {
+        M_snprintf(namebuf, sizeof(namebuf), "d_%s", DEH_String(music->name));
+        music->lumpnum = W_GetNumForName(namebuf);
+    }
+
+    music->data = W_CacheLumpNum(music->lumpnum, PU_STATIC);
+
+    handle = I_RegisterSong(music->data, W_LumpLength(music->lumpnum));
+    music->handle = handle;
+    I_PlaySong(handle, looping);
+
+    mus_playing = music;
 }
 
 boolean S_MusicPlaying(void)
 {
-    //return I_MusicIsPlaying();
-	return false;
+    return I_MusicIsPlaying();
 }
 
 void S_StopMusic(void)
 {
-//    if (mus_playing)
-//    {
-//        if (mus_paused)
-//        {
-//            I_ResumeSong();
-//        }
-//
-//        I_StopSong();
-//        I_UnRegisterSong(mus_playing->handle);
-//        W_ReleaseLumpNum(mus_playing->lumpnum);
-//        mus_playing->data = NULL;
-//        mus_playing = NULL;
-//    }
+    if (mus_playing)
+    {
+        if (mus_paused)
+        {
+            I_ResumeSong();
+        }
+
+        I_StopSong();
+        I_UnRegisterSong(mus_playing->handle);
+        W_ReleaseLumpNum(mus_playing->lumpnum);
+        mus_playing->data = NULL;
+        mus_playing = NULL;
+    }
 }
 

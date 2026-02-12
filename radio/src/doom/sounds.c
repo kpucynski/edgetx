@@ -33,7 +33,79 @@
 
 musicinfo_t S_music[] =
 {
-    MUSIC(NULL),
+    MUSIC(NULL),       // mus_None
+
+    MUSIC("e1m1"),     // mus_e1m1
+    MUSIC("e1m2"),
+    MUSIC("e1m3"),
+    MUSIC("e1m4"),
+    MUSIC("e1m5"),
+    MUSIC("e1m6"),
+    MUSIC("e1m7"),
+    MUSIC("e1m8"),
+    MUSIC("e1m9"),
+
+    MUSIC("e2m1"),     // mus_e2m1
+    MUSIC("e2m2"),
+    MUSIC("e2m3"),
+    MUSIC("e2m4"),
+    MUSIC("e2m5"),
+    MUSIC("e2m6"),
+    MUSIC("e2m7"),
+    MUSIC("e2m8"),
+    MUSIC("e2m9"),
+
+    MUSIC("e3m1"),     // mus_e3m1
+    MUSIC("e3m2"),
+    MUSIC("e3m3"),
+    MUSIC("e3m4"),
+    MUSIC("e3m5"),
+    MUSIC("e3m6"),
+    MUSIC("e3m7"),
+    MUSIC("e3m8"),
+    MUSIC("e3m9"),
+
+    MUSIC("inter"),    // mus_inter
+    MUSIC("intro"),    // mus_intro
+    MUSIC("bunny"),    // mus_bunny
+    MUSIC("victor"),   // mus_victor
+    MUSIC("introa"),   // mus_introa
+
+    MUSIC("runnin"),   // mus_runnin  (DOOM II)
+    MUSIC("stalks"),
+    MUSIC("countd"),
+    MUSIC("betwee"),
+    MUSIC("doom"),
+    MUSIC("the_da"),
+    MUSIC("shawn"),
+    MUSIC("ddtblu"),
+    MUSIC("in_cit"),
+    MUSIC("dead"),
+    MUSIC("stlks2"),
+    MUSIC("theda2"),
+    MUSIC("doom2"),
+    MUSIC("ddtbl2"),
+    MUSIC("runni2"),
+    MUSIC("dead2"),
+    MUSIC("stlks3"),
+    MUSIC("romero"),
+    MUSIC("shawn2"),
+    MUSIC("messag"),
+    MUSIC("count2"),
+    MUSIC("ddtbl3"),
+    MUSIC("ampie"),
+    MUSIC("theda3"),
+    MUSIC("adrian"),
+    MUSIC("messg2"),
+    MUSIC("romer2"),
+    MUSIC("tense"),
+    MUSIC("shawn3"),
+    MUSIC("openin"),
+    MUSIC("evil"),
+    MUSIC("ultima"),
+    MUSIC("read_m"),
+    MUSIC("dm2ttl"),
+    MUSIC("dm2int"),   // mus_dm2int
 };
 
 

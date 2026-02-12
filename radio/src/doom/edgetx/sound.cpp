@@ -20,6 +20,7 @@
  */
 
 #include "sound.h"
+#include "music.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -226,7 +227,7 @@ static void edgetx_Update(void)
             break;
         }
 
-        /* Check if there are any active channels */
+        /* Check if there are any active audio sources */
         boolean any_active = false;
         for (int ch = 0; ch < NUM_CHANNELS; ch++) {
             if (channels[ch].active) {
@@ -234,10 +235,11 @@ static void edgetx_Update(void)
                 break;
             }
         }
+        boolean has_music = music_is_generating();
 
         /* Don't push silent buffers — avoids wasting DMA bandwidth
          * and lets the I2S stop when idle */
-        if (!any_active)
+        if (!any_active && !has_music)
             break;
 
         /* Zero the buffer */
@@ -274,6 +276,11 @@ static void edgetx_Update(void)
             c->pos += to_mix;
             if (c->pos >= c->length)
                 c->active = false;
+        }
+
+        /* Mix music into the same buffer */
+        if (has_music) {
+            music_mix_into_buffer((int16_t *)buf->data, AUDIO_BUFFER_SIZE);
         }
 
         audioQueue.buffersFifo.audioPushBuffer();

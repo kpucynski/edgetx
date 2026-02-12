@@ -11,6 +11,8 @@ Based on the earlier [edgetx-doom](https://github.com/DavBfr/edgetx-doom) proof-
 - Runs DOOM (shareware or full) on the TX15 hardware
 - Reads `DOOM1.WAD` from the SD card at `/DOOM/DOOM1.WAD`
 - Renders at 320×200 internal resolution, scaled to 480×272 via nearest-neighbor
+- **Sound effects** — all 109 SFX from the WAD, resampled and mixed in real-time
+- **Music** — MUS format playback via square-wave synthesis (chiptune style)
 - Hardware keys mapped to DOOM controls (D-pad, Enter, Esc)
 - Long-press power button to shut down
 
@@ -73,6 +75,7 @@ All changes are gated behind `#if defined(WITH_DOOM)` — zero impact on normal 
 | `radio/src/edgetx.cpp` | Skip LVGL init when `WITH_DOOM` is defined |
 | `radio/src/model_init.cpp` | Skip COLORLCD layout factory when `WITH_DOOM` is defined |
 | `radio/src/sdcard.h` | `DOOM_PATH` definition |
+| `radio/src/audio.h` | `AUDIO_BUFFER_COUNT = 6` for DOOM builds (covers one game frame) |
 | `radio/src/gui/colorlcd/mainview/view_statistics.cpp` | Guard stack display with `#ifndef WITH_DOOM` |
 
 ## New files
@@ -82,6 +85,8 @@ All changes are gated behind `#if defined(WITH_DOOM)` — zero impact on normal 
   - `display.cpp` / `display.h` — LCD framebuffer interface
   - `doomgeneric.cpp` / `doomgeneric.h` — Hardware init, input, timing
   - `doom_main.h` — Entry point declaration
+  - `sound.cpp` / `sound.h` — SFX audio module (`sound_module_t`)
+  - `music.cpp` / `music.h` — MUS music module (`music_module_t`)
 
 ## Technical details
 
@@ -91,6 +96,16 @@ All changes are gated behind `#if defined(WITH_DOOM)` — zero impact on normal 
 - **Memory**: DOOM zone allocator uses 2MB from SDRAM heap via `malloc`
 - **WAD I/O**: Uses FatFS (`f_open` / `f_read` / `f_lseek`) to read WAD files from the SD card
 - **Scaling**: 320×200 → 480×272 nearest-neighbor, palette-indexed to RGB565 conversion per frame
+
+### Audio
+
+- **Hardware path**: EdgeTX AudioBufferFifo → DMA → SPI2 (I2S) → TAS2505 codec → speaker
+- **Format**: 32 kHz, 16-bit signed, mono
+- **SFX pipeline**: WAD lump loading → 8-bit unsigned to 16-bit signed conversion → linear-interpolation resampling (11025 → 32000 Hz) → up to 8-channel mixing → AudioBufferFifo
+- **SFX cache**: Up to 64 decoded/resampled sounds kept in memory to avoid re-processing
+- **Music pipeline**: MUS format parser → 140 tick/sec sequencer → per-sample square-wave synthesis (melodic) + LFSR noise (percussion) → mixed into the same audio buffer as SFX
+- **Music voices**: 16 channels (0-14 melodic, 15 percussion), with per-channel volume, pitch bend, and attack/release envelopes
+- **Buffer strategy**: 6 × 10 ms buffers (320 samples each) to cover one game frame (~28 ms at 35 fps)
 
 ## License
 
