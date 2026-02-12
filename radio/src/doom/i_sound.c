@@ -63,10 +63,14 @@ int snd_sfxdevice = SNDDEVICE_SB;
 // Sound modules
 
 extern void I_InitTimidityConfig(void);
+#ifdef WITH_DOOM
+extern sound_module_t sound_edgetx_module;
+#else
 extern sound_module_t sound_sdl_module;
 extern sound_module_t sound_pcsound_module;
 extern music_module_t music_sdl_module;
 extern music_module_t music_opl_module;
+#endif
 
 // For OPL module:
 
@@ -91,7 +95,9 @@ static int snd_mport = 0;
 
 static sound_module_t *sound_modules[] = 
 {
-#ifdef FEATURE_SOUND
+#ifdef WITH_DOOM
+    &sound_edgetx_module,
+#elif defined(FEATURE_SOUND)
     &sound_sdl_module,
     &sound_pcsound_module,
 #endif
@@ -102,7 +108,7 @@ static sound_module_t *sound_modules[] =
 
 static music_module_t *music_modules[] =
 {
-#ifdef FEATURE_SOUND
+#if defined(FEATURE_SOUND) && !defined(WITH_DOOM)
     &music_sdl_module,
     &music_opl_module,
 #endif

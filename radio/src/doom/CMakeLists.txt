@@ -9,7 +9,7 @@ set(SRC ${SRC}
   doom/d_loop.c doom/f_finale.c doom/i_main.c doom/m_bbox.c doom/p_doors.c doom/p_saveg.c doom/r_draw.c doom/st_stuff.c
   doom/d_main.c doom/f_wipe.c doom/i_scale.c doom/m_cheat.c doom/p_enemy.c doom/p_setup.c doom/r_main.c doom/statdump.c
   doom/d_mode.c doom/g_game.c doom/i_sound.c doom/m_config.c doom/p_floor.c doom/p_sight.c doom/r_plane.c doom/tables.c
-  doom/d_net.c doom/gusconf.c doom/i_system.c doom/m_controls.c doom/p_inter.c doom/p_spec.c doom/r_segs.c doom/v_video.c doom/edgetx/display.cpp doom/edgetx/doomgeneric.cpp
+  doom/d_net.c doom/gusconf.c doom/i_system.c doom/m_controls.c doom/p_inter.c doom/p_spec.c doom/r_segs.c doom/v_video.c doom/edgetx/display.cpp doom/edgetx/doomgeneric.cpp doom/edgetx/sound.cpp
 )
 
 message(STATUS "Build DOOM firmware")
