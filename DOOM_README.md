@@ -12,8 +12,8 @@ Based on the earlier [edgetx-doom](https://github.com/DavBfr/edgetx-doom) proof-
 - Reads `DOOM1.WAD` from the SD card at `/DOOM/DOOM1.WAD`
 - Renders at 320×200 internal resolution, scaled to 480×272 via nearest-neighbor
 - **Sound effects** — all 109 SFX from the WAD, resampled and mixed in real-time
-- **Music** — MUS format playback via square-wave synthesis (chiptune style)
-- Hardware keys mapped to DOOM controls (D-pad, Enter, Esc)
+- **Music** — MUS format playback via triangle/square-wave synthesis (chiptune style)
+- Hardware keys mapped to DOOM controls (RTN, PAGE, ROLL, SYS, MDL, TELE)
 - Long-press power button to shut down
 
 ## Prerequisites
@@ -53,15 +53,15 @@ The output `firmware.uf2` is ready to flash.
 
 ## Controls
 
-| Key | Action |
-|-----|--------|
-| D-pad Up | Move forward |
-| D-pad Down | Move backward |
-| D-pad Left | Turn left |
-| D-pad Right | Turn right |
-| Enter | Fire (in game) / Select (in menu) |
-| Esc | Open menu |
-| SYS | Use (open doors, switches) |
+| TX15 Button | DOOM Action |
+|-------------|-------------|
+| RTN | Move forward |
+| TELE | Move backward |
+| PAGE< | Turn left |
+| PAGE> | Turn right |
+| ROLL (push) | Fire / Select |
+| SYS | Open menu (Esc) |
+| MDL | Use (open doors, switches) |
 | Power (long press) | Shut down |
 
 ## Changes to EdgeTX core
