@@ -13,7 +13,8 @@ Based on the earlier [edgetx-doom](https://github.com/DavBfr/edgetx-doom) proof-
 - Renders at 320×200 internal resolution, scaled to 480×272 via nearest-neighbor
 - **Sound effects** — all 109 SFX from the WAD, resampled and mixed in real-time
 - **Music** — MUS format playback via triangle/square-wave synthesis (chiptune style)
-- Hardware keys mapped to DOOM controls (RTN, PAGE, ROLL, SYS, MDL, TELE)
+- **Gimbal controls** — dual-stick layout (left: move/strafe, right: turn) for intuitive FPS gameplay
+- Hardware buttons mapped for menu navigation and alternate controls
 - Long-press power button to shut down
 
 ## Prerequisites
@@ -53,6 +54,16 @@ The output `firmware.uf2` is ready to flash.
 
 ## Controls
 
+### Gimbals (Analog Sticks)
+
+| Gimbal | DOOM Action |
+|--------|-------------|
+| Left stick vertical | Move forward / backward |
+| Left stick horizontal | Strafe left / right |
+| Right stick horizontal | Turn left / right |
+
+### Buttons
+
 | TX15 Button | DOOM Action |
 |-------------|-------------|
 | RTN | Move forward |
@@ -63,6 +74,8 @@ The output `firmware.uf2` is ready to flash.
 | SYS | Open menu (Esc) |
 | MDL | Use (open doors, switches) |
 | Power (long press) | Shut down |
+
+**Note:** Gimbal controls are disabled when in menus — buttons continue to work for menu navigation.
 
 ## Changes to EdgeTX core
 
@@ -96,6 +109,15 @@ All changes are gated behind `#if defined(WITH_DOOM)` — zero impact on normal 
 - **Memory**: DOOM zone allocator uses 2MB from SDRAM heap via `malloc`
 - **WAD I/O**: Uses FatFS (`f_open` / `f_read` / `f_lseek`) to read WAD files from the SD card
 - **Scaling**: 320×200 → 480×272 nearest-neighbor, palette-indexed to RGB565 conversion per frame
+
+### Input
+
+- **Analog gimbals**: Read via `getADC()` / `evalInputs()` from `calibratedAnalogs[]` array (range: -1024 to +1024)
+- **Deadzone**: 6.5% of full range applied to eliminate stick drift
+- **Movement threshold**: 20% of full range triggers digital key events (forward/back/strafe)
+- **Turning**: Right stick horizontal mapped to DOOM joystick axis (`AD_RH`) for smooth analog turning (inverted: stick left → turn right)
+- **Digital buttons**: 16-entry keymap indexed by `EnumKeys` (0-15), supports press/release events
+- **Menu behavior**: Analog stick inputs disabled in menus to prevent navigation conflicts; buttons continue to work
 
 ### Audio
 
