@@ -70,12 +70,14 @@ The output `firmware.uf2` is ready to flash.
 | TELE | Move backward |
 | PAGE< | Turn left |
 | PAGE> | Turn right |
-| ROLL (push) | Fire / Select |
+| MDL | Fire |
+| ROLL (push) | Use (open doors, switches) |
 | SYS | Open menu (Esc) |
-| MDL | Use (open doors, switches) |
 | Power (long press) | Shut down |
 
-**Note:** Gimbal controls are disabled when in menus — buttons continue to work for menu navigation.
+**Note:** 
+- Gimbal controls are disabled in menus to avoid navigation conflicts
+- ROLL button acts as ENTER in menus for selection/confirmation, and as USE in-game for doors/switches
 
 ## Changes to EdgeTX core
 
@@ -127,7 +129,7 @@ All changes are gated behind `#if defined(WITH_DOOM)` — zero impact on normal 
 - **SFX cache**: Up to 64 decoded/resampled sounds kept in memory to avoid re-processing
 - **Music pipeline**: MUS format parser → 140 tick/sec sequencer → per-sample waveform synthesis (triangle/square blend for melodic, filtered LFSR noise for percussion) → mixed into the same audio buffer as SFX
 - **Music voices**: 16 channels (0-14 melodic, 15 percussion), with per-channel volume, pitch bend, attack/release envelopes, and 1-pole low-pass filtering
-- **Music waveforms**: Melodic channels use a 75% triangle / 25% square blend for warm tone with audible bass; percussion uses amplitude-filtered noise with moderate decay
+- **Music waveforms**: Melodic channels use a 75% triangle / 25% square blend for warm tone with audible bass; percussion uses filtered LFSR noise (±8000 amplitude with 1/2 old + 1/2 new low-pass) for smooth, non-crackly hi-hats and moderate decay
 - **Buffer strategy**: 6 × 10 ms buffers (320 samples each) to cover one game frame (~28 ms at 35 fps)
 
 ## License

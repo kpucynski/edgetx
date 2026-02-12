@@ -291,10 +291,10 @@ static inline int16_t synth_percussion(mus_voice_t *v, uint32_t *lfsr)
     l = (l >> 1) ^ (-(int32_t)(l & 1) & 0xB400u);
     *lfsr = l;
 
-    int16_t raw = (l & 1) ? 12000 : -12000;
+    int16_t raw = (l & 1) ? 8000 : -8000;
 
-    /* Light low-pass: 1/4 old + 3/4 new — tames harshness, keeps snap */
-    v->lpf = (v->lpf + (int32_t)raw * 3) >> 2;
+    /* Heavier low-pass: 1/2 old + 1/2 new — smooths hi-hats, less crackly */
+    v->lpf = (v->lpf + (int32_t)raw) >> 1;
     int16_t sample = (int16_t)v->lpf;
 
     int32_t s = ((int32_t)sample * v->volume) >> 7;

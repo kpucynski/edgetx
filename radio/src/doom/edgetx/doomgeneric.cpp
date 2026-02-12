@@ -30,11 +30,11 @@ const uint8_t keyboardMap[] = {KEY_ESCAPE,   KEY_USE,       KEY_ENTER,
 /*  Index → EnumKeys    → TX15 button → DOOM action
  *  0       KEY_MENU      (n/a)
  *  1       KEY_EXIT      RTN          → KEY_UPARROW   (move forward)
- *  2       KEY_ENTER     ROLL PUSH    → KEY_ENTER     (fire / select)
+ *  2       KEY_ENTER     ROLL PUSH    → KEY_USE       (open doors)
  *  3       KEY_PAGEUP    PAGE<        → KEY_LEFTARROW (turn left)
  *  4       KEY_PAGEDN    PAGE>        → KEY_RIGHTARROW(turn right)
  *  5-10    (unused on TX15)
- *  11      KEY_MODEL     MDL          → KEY_USE       (open doors)
+ *  11      KEY_MODEL     MDL          → KEY_FIRE      (fire)
  *  12      KEY_TELE      TELE         → KEY_DOWNARROW (move backward)
  *  13      KEY_SYS       SYS          → KEY_ESCAPE    (menu)
  *  14-15   (unused)
@@ -42,12 +42,12 @@ const uint8_t keyboardMap[] = {KEY_ESCAPE,   KEY_USE,       KEY_ENTER,
 const uint8_t keyboardMap[16] = {
     0,              // 0  KEY_MENU   — not on TX15
     KEY_UPARROW,    // 1  KEY_EXIT   — RTN
-    KEY_ENTER,      // 2  KEY_ENTER  — ROLL push
+    KEY_USE,        // 2  KEY_ENTER  — ROLL push
     KEY_LEFTARROW,  // 3  KEY_PAGEUP — PAGE<
     KEY_RIGHTARROW, // 4  KEY_PAGEDN — PAGE>
     0, 0, 0, 0,     // 5-8  unused
     0, 0,            // 9-10 unused
-    KEY_USE,        // 11 KEY_MODEL  — MDL
+    KEY_FIRE,       // 11 KEY_MODEL  — MDL
     KEY_DOWNARROW,  // 12 KEY_TELE   — TELE
     KEY_ESCAPE,     // 13 KEY_SYS    — SYS
     0, 0             // 14-15 unused
@@ -148,8 +148,9 @@ int DG_GetKey(int* pressed, unsigned char* key) {
     uint32_t k = 1 << i;
     if ((keys & k) && !(oldKeys & k)) {
       *key = keyboardMap[i];
-      if (!menuactive && *key == KEY_ENTER) {
-        *key = KEY_FIRE;
+      // In menus, ROLL (KEY_USE) should work as ENTER for selection
+      if (menuactive && *key == KEY_USE) {
+        *key = KEY_ENTER;
       }
       *pressed = 1;
       oldKeys |= k;
@@ -157,8 +158,9 @@ int DG_GetKey(int* pressed, unsigned char* key) {
     }
     if (!(keys & k) && (oldKeys & k)) {
       *key = keyboardMap[i];
-      if (!menuactive && *key == KEY_ENTER) {
-        *key = KEY_FIRE;
+      // In menus, ROLL (KEY_USE) should work as ENTER for selection
+      if (menuactive && *key == KEY_USE) {
+        *key = KEY_ENTER;
       }
       *pressed = 0;
       oldKeys = oldKeys & (~k);
