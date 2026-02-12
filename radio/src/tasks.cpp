@@ -36,12 +36,20 @@
 #include "startup_shutdown.h"
 #endif
 
+#ifdef WITH_DOOM
+#include "doom_main.h"
+#endif
+
 task_handle_t menusTaskId;
+#ifndef WITH_DOOM
 TASK_DEFINE_STACK(menusStack, MENUS_STACK_SIZE);
+#endif
 
 #if defined(AUDIO)
 task_handle_t audioTaskId;
+#ifndef WITH_DOOM
 TASK_DEFINE_STACK(audioStack, AUDIO_STACK_SIZE);
+#endif
 #endif
 
 mutex_handle_t audioMutex;
@@ -155,6 +163,22 @@ static void timer1msStart()
 }
 #endif
 
+#if defined(WITH_DOOM)
+#define DOOM_STACK_SIZE     8192
+
+task_handle_t doomTaskId;
+TASK_DEFINE_STACK(doomStack, DOOM_STACK_SIZE);
+
+static void doomTask()
+{
+  char* argv[] = {(char*)"doom", (char*)"-iwad", (char*)DOOM_PATH "/DOOM1.WAD", NULL};
+  int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+
+  doom_main(argc, argv);
+  boardOff();
+}
+#endif
+
 void tasksStart()
 {
   mutex_create(&audioMutex);
@@ -169,6 +193,10 @@ void tasksStart()
 
   timer10msStart();
 
+#if defined(WITH_DOOM)
+  task_create(&doomTaskId, doomTask, "doom", doomStack, DOOM_STACK_SIZE,
+              MIXER_TASK_PRIO);
+#else
   task_create(&menusTaskId, menusTask, "menus", menusStack, MENUS_STACK_SIZE,
               MENUS_TASK_PRIO);
 
@@ -176,6 +204,7 @@ void tasksStart()
   task_create(&audioTaskId, audioTask, "audio", audioStack, AUDIO_STACK_SIZE,
               AUDIO_TASK_PRIO);
 #endif
+#endif // WITH_DOOM
 
   RTOS_START();
 }

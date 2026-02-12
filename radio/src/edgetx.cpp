@@ -1658,7 +1658,7 @@ int main()
   modulePortInit();
   pulsesInit();
 
-#if defined(COLORLCD)
+#if defined(COLORLCD) && !defined(WITH_DOOM)
   // Do all lvgl init in case of fatal error on startup
   extern void initLvgl();
   initLvgl();

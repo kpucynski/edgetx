@@ -147,7 +147,7 @@ void applyDefaultTemplate()
   initCustomSwitches();
 #endif
 
-#if defined(COLORLCD)
+#if defined(COLORLCD) && !defined(WITH_DOOM)
   g_model.resetScreenData();
   LayoutFactory::loadDefaultLayout();
 #endif
