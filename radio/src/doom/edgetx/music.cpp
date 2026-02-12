@@ -91,6 +91,7 @@ typedef struct {
     uint32_t phase;         /* waveform phase accumulator            */
     int16_t  env;           /* envelope 0-256                        */
     bool     releasing;     /* in release phase                      */
+    int32_t  lpf;           /* simple 1-pole low-pass filter state   */
 } mus_voice_t;
 
 /* ------------------------------------------------------------------ */
@@ -107,6 +108,7 @@ static struct {
     bool           looping;
     bool           paused;
     int            volume;      /* master music volume 0-127         */
+    int            fade_in;     /* master fade-in ramp 0-256         */
 
     const uint8_t *data;        /* full MUS lump (for rewind)        */
     uint32_t       data_len;
@@ -253,8 +255,16 @@ static inline int16_t synth_melodic(mus_voice_t *v)
 
     v->phase += inc;
 
-    /* 50 % duty-cycle square wave, ±8192 amplitude */
-    int16_t sample = (v->phase & 0x8000) ? 8192 : -8192;
+    /* Blend: 75% triangle + 25% square for body without harshness.
+     * Triangle provides the smooth fundamental, square adds warmth. */
+    int32_t tri_raw = (int32_t)(v->phase & 0xFFFF) - 32768;
+    int32_t tri = (tri_raw < 0 ? -tri_raw : tri_raw) - 16384;
+    int32_t sqr = (v->phase & 0x8000) ? 12288 : -12288;
+    int16_t sample = (int16_t)((tri * 3 + sqr) >> 2);
+
+    /* Light 1-pole low-pass: 1/2 old + 1/2 new — retains bass punch */
+    v->lpf = (v->lpf + (int32_t)sample) >> 1;
+    sample = (int16_t)v->lpf;
 
     /* Volume × envelope */
     int32_t s = ((int32_t)sample * v->volume) >> 7;
@@ -265,7 +275,7 @@ static inline int16_t synth_melodic(mus_voice_t *v)
         v->env -= 3;
         if (v->env <= 0) { v->env = 0; v->active = false; }
     } else if (v->env < 256) {
-        v->env += 32;
+        v->env += 4;          /* ~20ms attack at 32kHz */
         if (v->env > 256) v->env = 256;
     }
 
@@ -281,13 +291,17 @@ static inline int16_t synth_percussion(mus_voice_t *v, uint32_t *lfsr)
     l = (l >> 1) ^ (-(int32_t)(l & 1) & 0xB400u);
     *lfsr = l;
 
-    int16_t sample = (l & 1) ? 6000 : -6000;
+    int16_t raw = (l & 1) ? 12000 : -12000;
+
+    /* Light low-pass: 1/4 old + 3/4 new — tames harshness, keeps snap */
+    v->lpf = (v->lpf + (int32_t)raw * 3) >> 2;
+    int16_t sample = (int16_t)v->lpf;
 
     int32_t s = ((int32_t)sample * v->volume) >> 7;
     s = (s * v->env) >> 8;
 
-    /* fast decay */
-    v->env -= 2;
+    /* Moderate decay — longer than a click, shorter than a drone */
+    v->env -= 1;
     if (v->env <= 0) { v->env = 0; v->active = false; }
 
     return (int16_t)s;
@@ -322,9 +336,11 @@ extern "C" void music_mix_into_buffer(int16_t *buffer, uint32_t count)
                 mix += synth_melodic(v);
         }
 
-        /* Master music volume and headroom scaling */
+        /* Master music volume, fade-in ramp, and headroom scaling */
+        if (mus.fade_in < 256) mus.fade_in++;
         mix = (mix * mus.volume) / 127;
-        mix >>= 2;
+        mix = (mix * mus.fade_in) >> 8;
+        mix >>= 1;
 
         /* Accumulate into SFX buffer with clamping */
         int32_t out = (int32_t)buffer[i] + mix;
@@ -423,6 +439,7 @@ static void edgetx_music_PlaySong(void *handle, boolean looping)
         mus.ch_vol[i] = 100;
 
     mus.noise_lfsr = 1;
+    mus.fade_in    = 0;
     mus.playing    = true;
 
     DOOM_LOG("[music] Playing%s\r\n", looping ? " (loop)" : "");

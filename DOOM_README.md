@@ -103,8 +103,9 @@ All changes are gated behind `#if defined(WITH_DOOM)` — zero impact on normal 
 - **Format**: 32 kHz, 16-bit signed, mono
 - **SFX pipeline**: WAD lump loading → 8-bit unsigned to 16-bit signed conversion → linear-interpolation resampling (11025 → 32000 Hz) → up to 8-channel mixing → AudioBufferFifo
 - **SFX cache**: Up to 64 decoded/resampled sounds kept in memory to avoid re-processing
-- **Music pipeline**: MUS format parser → 140 tick/sec sequencer → per-sample square-wave synthesis (melodic) + LFSR noise (percussion) → mixed into the same audio buffer as SFX
-- **Music voices**: 16 channels (0-14 melodic, 15 percussion), with per-channel volume, pitch bend, and attack/release envelopes
+- **Music pipeline**: MUS format parser → 140 tick/sec sequencer → per-sample waveform synthesis (triangle/square blend for melodic, filtered LFSR noise for percussion) → mixed into the same audio buffer as SFX
+- **Music voices**: 16 channels (0-14 melodic, 15 percussion), with per-channel volume, pitch bend, attack/release envelopes, and 1-pole low-pass filtering
+- **Music waveforms**: Melodic channels use a 75% triangle / 25% square blend for warm tone with audible bass; percussion uses amplitude-filtered noise with moderate decay
 - **Buffer strategy**: 6 × 10 ms buffers (320 samples each) to cover one game frame (~28 ms at 35 fps)
 
 ## License

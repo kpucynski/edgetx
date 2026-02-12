@@ -180,8 +180,8 @@ static boolean edgetx_Init(boolean use_sfx_prefix)
     memset(channels, 0, sizeof(channels));
     cache_count = 0;
 
-    /* Set speaker volume (range 0-VOLUME_LEVEL_MAX, 12 is default) */
-    audioSetVolume(VOLUME_LEVEL_DEF);
+    /* Set speaker volume to ~70% for DOOM */
+    audioSetVolume(16);
 
     DOOM_LOG("[sound] EdgeTX sound module initialised (rate=%d)\r\n",
              TARGET_RATE);
@@ -253,7 +253,7 @@ static void edgetx_Update(void)
                 continue;
 
             /* Volume scaling: DOOM volume is 0-127.
-             * We map to a multiplier: vol / 127, applied as (sample * vol) >> 7 */
+             * Scale to ~60%: (sample * vol * 5) >> 9 ≈ 0.6x boost */
             int vol = c->vol;
             if (vol <= 0) {
                 c->active = false;
@@ -265,7 +265,7 @@ static void edgetx_Update(void)
 
             const int16_t *src = c->data + c->pos;
             for (uint32_t i = 0; i < to_mix; i++) {
-                int32_t s = ((int32_t)src[i] * vol) >> 7;
+                int32_t s = ((int32_t)src[i] * vol * 5) >> 9;
                 /* Accumulate (mix) — clamp after all channels */
                 int32_t mixed = (int32_t)buf->data[i] + s;
                 if (mixed > 32767)  mixed = 32767;
