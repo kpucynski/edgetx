@@ -57,7 +57,7 @@ The output `firmware.uf2` is ready to flash.
 ### Gimbals (Analog Sticks)
 
 | Gimbal | DOOM Action |
-|--------|-------------|
+| -------- | ------------- |
 | Left stick vertical | Move forward / backward |
 | Left stick horizontal | Strafe left / right |
 | Right stick horizontal | Turn left / right |
@@ -65,7 +65,7 @@ The output `firmware.uf2` is ready to flash.
 ### Buttons
 
 | TX15 Button | DOOM Action |
-|-------------|-------------|
+| ----------- | ----------- |
 | RTN | Move forward |
 | TELE | Move backward |
 | PAGE< | Turn left |
@@ -75,7 +75,8 @@ The output `firmware.uf2` is ready to flash.
 | SYS | Open menu (Esc) |
 | Power (long press) | Shut down |
 
-**Note:** 
+**Note:**
+
 - Gimbal controls are disabled in menus to avoid navigation conflicts
 - ROLL button acts as ENTER in menus for selection/confirmation, and as USE in-game for doors/switches
 
@@ -84,7 +85,7 @@ The output `firmware.uf2` is ready to flash.
 All changes are gated behind `#if defined(WITH_DOOM)` — zero impact on normal builds.
 
 | File | Change |
-|------|--------|
+| ------ | -------- |
 | `radio/src/CMakeLists.txt` | `WITH_DOOM` option, include doom subdirectory |
 | `radio/src/tasks.cpp` | DOOM RTOS task (32KB stack) as alternative to menus/audio tasks |
 | `radio/src/edgetx.cpp` | Skip LVGL init when `WITH_DOOM` is defined |
