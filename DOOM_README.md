@@ -59,8 +59,8 @@ The output `firmware.uf2` is ready to flash.
 | Gimbal | DOOM Action |
 | -------- | ------------- |
 | Left stick vertical | Move forward / backward |
-| Left stick horizontal | Strafe left / right |
-| Right stick horizontal | Turn left / right |
+| Left stick horizontal | Turn left / right |
+| Right stick horizontal | Strafe left / right |
 
 ### Buttons
 
@@ -118,7 +118,7 @@ All changes are gated behind `#if defined(WITH_DOOM)` — zero impact on normal 
 - **Analog gimbals**: Read via `getADC()` / `evalInputs()` from `calibratedAnalogs[]` array (range: -1024 to +1024)
 - **Deadzone**: 6.5% of full range applied to eliminate stick drift
 - **Movement threshold**: 20% of full range triggers digital key events (forward/back/strafe)
-- **Turning**: Right stick horizontal mapped to DOOM joystick axis (`AD_RH`) for smooth analog turning (inverted: stick left → turn right)
+- **Turning**: Left stick horizontal mapped to DOOM joystick axis (`AD_RH`) for smooth analog turning (inverted: stick left → turn right)
 - **Digital buttons**: 16-entry keymap indexed by `EnumKeys` (0-15), supports press/release events
 - **Menu behavior**: Analog stick inputs disabled in menus to prevent navigation conflicts; buttons continue to work
 

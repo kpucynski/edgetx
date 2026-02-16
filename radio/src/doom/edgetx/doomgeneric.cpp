@@ -83,8 +83,8 @@ void dg_Create() {
 
 // Gimbal analog values for movement control
 static int16_t stickLeftV = 0;   // Left stick vertical: forward/back
-static int16_t stickLeftH = 0;   // Left stick horizontal: strafe left/right
-static int16_t stickRightH = 0;  // Right stick horizontal: turn left/right
+static int16_t stickLeftH = 0;   // Left stick horizontal: turn left/right
+static int16_t stickRightH = 0;  // Right stick horizontal: strafe left/right
 
 // Export analog values for joystick event generation in i_input.c
 // These are in the range -32767 to 32767 as expected by DOOM
@@ -104,8 +104,8 @@ void button_update_loop() {
   
   // Read stick positions:
   // Left stick vertical (ADC_MAIN_LV = index 1) for forward/back
-  // Left stick horizontal (ADC_MAIN_LH = index 0) for strafing
-  // Right stick horizontal (ADC_MAIN_RH = index 3) for turning
+  // Left stick horizontal (ADC_MAIN_LH = index 0) for turning
+  // Right stick horizontal (ADC_MAIN_RH = index 3) for strafing
   int16_t lv_raw = calibratedAnalogs[ADC_MAIN_LV];
   int16_t lh_raw = calibratedAnalogs[ADC_MAIN_LH];
   int16_t rh_raw = calibratedAnalogs[ADC_MAIN_RH];
@@ -118,7 +118,7 @@ void button_update_loop() {
   // Convert to DOOM joystick range (-32767 to 32767)
   // Note: RESX = 1024, so we multiply by ~32 to get full range
   AD_RV = 0;  // Not using right vertical for now
-  AD_RH = -(stickRightH * 32767) / RESX;  // Right horizontal for turning (inverted)
+  AD_RH = -(stickLeftH * 32767) / RESX;  // Left horizontal for turning (inverted)
 
   if (pwrPressed()) {
     boardOff();
@@ -179,10 +179,10 @@ int DG_GetKey(int* pressed, unsigned char* key) {
       newAnalogKeys |= 0x02;  // Backward
     }
     
-    // Left stick horizontal: strafe left/right
-    if (stickLeftH < -STICK_MOVEMENT_THRESHOLD) {
+    // Right stick horizontal: strafe left/right
+    if (stickRightH < -STICK_MOVEMENT_THRESHOLD) {
       newAnalogKeys |= 0x04;  // Strafe left
-    } else if (stickLeftH > STICK_MOVEMENT_THRESHOLD) {
+    } else if (stickRightH > STICK_MOVEMENT_THRESHOLD) {
       newAnalogKeys |= 0x08;  // Strafe right
     }
     
