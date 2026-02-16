@@ -90,6 +90,8 @@ constexpr uint8_t AUDIO_FILENAME_MAXLEN = (AUDIO_LUA_FILENAME_MAXLEN > AUDIO_MOD
 
 #if defined(SIMU)
   #define AUDIO_BUFFER_COUNT           (10) // simulator needs more buffers for smooth audio
+#elif defined(WITH_DOOM)
+  #define AUDIO_BUFFER_COUNT           (6)  // DOOM needs enough buffers to cover one game frame (~28ms)
 #elif defined(AUDIO_SPI)
   #define AUDIO_BUFFER_COUNT           (2)  // smaller than Taranis since there is also a buffer on the ADC chip
 #elif defined(STORAGE_USE_SPI_FLASH)

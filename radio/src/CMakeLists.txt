@@ -60,6 +60,7 @@ else()
   option(USBJ_EX "Enable USB Joystick Extension" ON)
 endif()
 option(AUDIO "Enable audio" ON)
+option(WITH_DOOM "Enable doom" OFF)
 
 if(NATIVE_BUILD)
   option(ALL_LANGUAGES "Enable runtime language selection" ON)
@@ -202,6 +203,10 @@ endif()
 
 if(LUA)
   include(lua/CMakeLists.txt)
+endif()
+
+if(WITH_DOOM)
+  include(doom/CMakeLists.txt)
 endif()
 
 if(HELI)

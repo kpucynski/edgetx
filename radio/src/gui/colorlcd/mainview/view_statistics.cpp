@@ -306,6 +306,7 @@ void DebugViewPage::build(Window* window)
   line->padAll(PAD_ZERO);
   line->padLeft(PAD_LARGE);
 #endif
+#ifndef WITH_DOOM
   new DebugInfoNumber<uint32_t>(
       line, rect_t{0, 0, DBG_B_WIDTH, DBG_B_HEIGHT},
       [] { return task_get_stack_usage(&menusTaskId); }, STR_STACK_MENU);
@@ -317,6 +318,7 @@ void DebugViewPage::build(Window* window)
       line, rect_t{0, 0, DBG_B_WIDTH, DBG_B_HEIGHT},
       [] { return task_get_stack_usage(&audioTaskId); }, STR_STACK_AUDIO);
 #endif
+#endif // WITH_DOOM
 
 #if defined(DEBUG_LATENCY)
   line = window->newLine(grid2);
